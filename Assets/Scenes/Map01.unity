@@ -140,12 +140,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c20dd84f9be8c3a499dea12b811dc5bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  almacen: {fileID: 653199422}
-  M_frontera: {fileID: 2100000, guid: 6f7467d9efcf21e4793fbba51dd65c9d, type: 2}
-  M_visitados: {fileID: 2100000, guid: 2b81d85ec59778f48b65568d7c6f2919, type: 2}
-  origen: {fileID: 121392069488113083, guid: 264a2f8d01431034799c63e8fa9be46f, type: 3}
-  destino: {fileID: 121392069488113083, guid: c4315bd7591e3d94cb2d992c3426fed6, type: 3}
-  pasoRuta: {fileID: 121392069488113083, guid: 39672f4c7d116c349a6ec2f396290d2f, type: 3}
+  id: 101
   robot: {fileID: 110566335}
 --- !u!1001 &335088178
 PrefabInstance:
@@ -261,7 +256,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4214187151506443219, guid: 74adcc7a56a65e2489172438ae49c3d2, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 74adcc7a56a65e2489172438ae49c3d2, type: 3}
@@ -282,12 +277,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c20dd84f9be8c3a499dea12b811dc5bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  almacen: {fileID: 653199422}
-  M_frontera: {fileID: 2100000, guid: 6f7467d9efcf21e4793fbba51dd65c9d, type: 2}
-  M_visitados: {fileID: 2100000, guid: 2b81d85ec59778f48b65568d7c6f2919, type: 2}
-  origen: {fileID: 121392069488113083, guid: 264a2f8d01431034799c63e8fa9be46f, type: 3}
-  destino: {fileID: 121392069488113083, guid: c4315bd7591e3d94cb2d992c3426fed6, type: 3}
-  pasoRuta: {fileID: 121392069488113083, guid: 39672f4c7d116c349a6ec2f396290d2f, type: 3}
+  id: 0
   robot: {fileID: 599863417}
 --- !u!1 &653199421
 GameObject:
@@ -326,6 +316,10 @@ MonoBehaviour:
   bloqueES: {fileID: 5108523242280781603, guid: c2d4c328d66c5f6439dd7202b73feb5f, type: 3}
   bloqueRecarga: {fileID: 5108523242280781603, guid: 80f3bd4a8b931504c9b6b3a0aba0534f, type: 3}
   bloqueEstanteria: {fileID: 5108523242280781603, guid: 495e286987b9b5949ad004249014d63c, type: 3}
+  marcador: {fileID: 121392069488113083, guid: 39672f4c7d116c349a6ec2f396290d2f, type: 3}
+  marcadorDestino: {fileID: 121392069488113083, guid: c4315bd7591e3d94cb2d992c3426fed6, type: 3}
+  robot1: {fileID: 110566335}
+  robot2: {fileID: 669508849}
 --- !u!4 &653199423
 Transform:
   m_ObjectHideFlags: 0
@@ -336,6 +330,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
@@ -357,12 +352,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c20dd84f9be8c3a499dea12b811dc5bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  almacen: {fileID: 653199422}
-  M_frontera: {fileID: 2100000, guid: 6f7467d9efcf21e4793fbba51dd65c9d, type: 2}
-  M_visitados: {fileID: 2100000, guid: 2b81d85ec59778f48b65568d7c6f2919, type: 2}
-  origen: {fileID: 121392069488113083, guid: 264a2f8d01431034799c63e8fa9be46f, type: 3}
-  destino: {fileID: 121392069488113083, guid: c4315bd7591e3d94cb2d992c3426fed6, type: 3}
-  pasoRuta: {fileID: 121392069488113083, guid: 39672f4c7d116c349a6ec2f396290d2f, type: 3}
+  id: 102
   robot: {fileID: 669508849}
 --- !u!1 &705507993
 GameObject:
@@ -453,6 +443,7 @@ Transform:
   m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
@@ -508,13 +499,29 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1537547365843479333, guid: 74adcc7a56a65e2489172438ae49c3d2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1656845074198569555, guid: 74adcc7a56a65e2489172438ae49c3d2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1981912483012683436, guid: 74adcc7a56a65e2489172438ae49c3d2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4214187151506443219, guid: 74adcc7a56a65e2489172438ae49c3d2, type: 3}
       propertyPath: m_Name
       value: Robot (1)
       objectReference: {fileID: 0}
     - target: {fileID: 4214187151506443219, guid: 74adcc7a56a65e2489172438ae49c3d2, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8392256370951842971, guid: 74adcc7a56a65e2489172438ae49c3d2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 74adcc7a56a65e2489172438ae49c3d2, type: 3}
@@ -535,12 +542,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c20dd84f9be8c3a499dea12b811dc5bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  almacen: {fileID: 653199422}
-  M_frontera: {fileID: 2100000, guid: 6f7467d9efcf21e4793fbba51dd65c9d, type: 2}
-  M_visitados: {fileID: 2100000, guid: 2b81d85ec59778f48b65568d7c6f2919, type: 2}
-  origen: {fileID: 121392069488113083, guid: 264a2f8d01431034799c63e8fa9be46f, type: 3}
-  destino: {fileID: 121392069488113083, guid: c4315bd7591e3d94cb2d992c3426fed6, type: 3}
-  pasoRuta: {fileID: 121392069488113083, guid: 39672f4c7d116c349a6ec2f396290d2f, type: 3}
+  id: 0
   robot: {fileID: 725864230}
 --- !u!1 &743385589 stripped
 GameObject:
@@ -559,12 +561,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c20dd84f9be8c3a499dea12b811dc5bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  almacen: {fileID: 653199422}
-  M_frontera: {fileID: 2100000, guid: 6f7467d9efcf21e4793fbba51dd65c9d, type: 2}
-  M_visitados: {fileID: 2100000, guid: 2b81d85ec59778f48b65568d7c6f2919, type: 2}
-  origen: {fileID: 121392069488113083, guid: 264a2f8d01431034799c63e8fa9be46f, type: 3}
-  destino: {fileID: 121392069488113083, guid: c4315bd7591e3d94cb2d992c3426fed6, type: 3}
-  pasoRuta: {fileID: 121392069488113083, guid: 39672f4c7d116c349a6ec2f396290d2f, type: 3}
+  id: 0
   robot: {fileID: 743385589}
 --- !u!1 &752463601 stripped
 GameObject:
@@ -583,12 +580,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c20dd84f9be8c3a499dea12b811dc5bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  almacen: {fileID: 653199422}
-  M_frontera: {fileID: 2100000, guid: 6f7467d9efcf21e4793fbba51dd65c9d, type: 2}
-  M_visitados: {fileID: 2100000, guid: 2b81d85ec59778f48b65568d7c6f2919, type: 2}
-  origen: {fileID: 121392069488113083, guid: 264a2f8d01431034799c63e8fa9be46f, type: 3}
-  destino: {fileID: 121392069488113083, guid: c4315bd7591e3d94cb2d992c3426fed6, type: 3}
-  pasoRuta: {fileID: 121392069488113083, guid: 39672f4c7d116c349a6ec2f396290d2f, type: 3}
+  id: 0
   robot: {fileID: 752463601}
 --- !u!1 &759006600 stripped
 GameObject:
@@ -607,12 +599,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c20dd84f9be8c3a499dea12b811dc5bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  almacen: {fileID: 653199422}
-  M_frontera: {fileID: 2100000, guid: 6f7467d9efcf21e4793fbba51dd65c9d, type: 2}
-  M_visitados: {fileID: 2100000, guid: 2b81d85ec59778f48b65568d7c6f2919, type: 2}
-  origen: {fileID: 121392069488113083, guid: 264a2f8d01431034799c63e8fa9be46f, type: 3}
-  destino: {fileID: 121392069488113083, guid: c4315bd7591e3d94cb2d992c3426fed6, type: 3}
-  pasoRuta: {fileID: 121392069488113083, guid: 39672f4c7d116c349a6ec2f396290d2f, type: 3}
+  id: 0
   robot: {fileID: 759006600}
 --- !u!1001 &900199767
 PrefabInstance:
@@ -671,7 +658,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4214187151506443219, guid: 74adcc7a56a65e2489172438ae49c3d2, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 74adcc7a56a65e2489172438ae49c3d2, type: 3}
@@ -755,6 +742,7 @@ Transform:
   m_LocalRotation: {x: 0.2999947, y: 0.3647849, z: -0.13721462, w: 0.8706936}
   m_LocalPosition: {x: 5, y: 50, z: 5}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -891,7 +879,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4214187151506443219, guid: 74adcc7a56a65e2489172438ae49c3d2, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 74adcc7a56a65e2489172438ae49c3d2, type: 3}
@@ -912,12 +900,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c20dd84f9be8c3a499dea12b811dc5bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  almacen: {fileID: 653199422}
-  M_frontera: {fileID: 2100000, guid: 6f7467d9efcf21e4793fbba51dd65c9d, type: 2}
-  M_visitados: {fileID: 2100000, guid: 2b81d85ec59778f48b65568d7c6f2919, type: 2}
-  origen: {fileID: 121392069488113083, guid: 264a2f8d01431034799c63e8fa9be46f, type: 3}
-  destino: {fileID: 121392069488113083, guid: c4315bd7591e3d94cb2d992c3426fed6, type: 3}
-  pasoRuta: {fileID: 121392069488113083, guid: 39672f4c7d116c349a6ec2f396290d2f, type: 3}
+  id: 0
   robot: {fileID: 1421955360}
 --- !u!1 &1514419989 stripped
 GameObject:
@@ -936,12 +919,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c20dd84f9be8c3a499dea12b811dc5bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  almacen: {fileID: 653199422}
-  M_frontera: {fileID: 2100000, guid: 6f7467d9efcf21e4793fbba51dd65c9d, type: 2}
-  M_visitados: {fileID: 2100000, guid: 2b81d85ec59778f48b65568d7c6f2919, type: 2}
-  origen: {fileID: 121392069488113083, guid: 264a2f8d01431034799c63e8fa9be46f, type: 3}
-  destino: {fileID: 121392069488113083, guid: c4315bd7591e3d94cb2d992c3426fed6, type: 3}
-  pasoRuta: {fileID: 121392069488113083, guid: 39672f4c7d116c349a6ec2f396290d2f, type: 3}
+  id: 0
   robot: {fileID: 1514419989}
 --- !u!1 &1566333726
 GameObject:
@@ -986,6 +964,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -1034,6 +1013,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -1, z: 0}
   m_LocalScale: {x: 1000, y: 1, z: 1000}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 3
@@ -1095,7 +1075,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4214187151506443219, guid: 74adcc7a56a65e2489172438ae49c3d2, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 74adcc7a56a65e2489172438ae49c3d2, type: 3}
@@ -1156,7 +1136,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4214187151506443219, guid: 74adcc7a56a65e2489172438ae49c3d2, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 74adcc7a56a65e2489172438ae49c3d2, type: 3}
@@ -1217,7 +1197,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4214187151506443219, guid: 74adcc7a56a65e2489172438ae49c3d2, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 74adcc7a56a65e2489172438ae49c3d2, type: 3}
@@ -1238,12 +1218,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c20dd84f9be8c3a499dea12b811dc5bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  almacen: {fileID: 653199422}
-  M_frontera: {fileID: 2100000, guid: 6f7467d9efcf21e4793fbba51dd65c9d, type: 2}
-  M_visitados: {fileID: 2100000, guid: 2b81d85ec59778f48b65568d7c6f2919, type: 2}
-  origen: {fileID: 121392069488113083, guid: 264a2f8d01431034799c63e8fa9be46f, type: 3}
-  destino: {fileID: 121392069488113083, guid: c4315bd7591e3d94cb2d992c3426fed6, type: 3}
-  pasoRuta: {fileID: 121392069488113083, guid: 39672f4c7d116c349a6ec2f396290d2f, type: 3}
+  id: 0
   robot: {fileID: 1726120764}
 --- !u!1001 &1802092259
 PrefabInstance:
@@ -1302,7 +1277,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4214187151506443219, guid: 74adcc7a56a65e2489172438ae49c3d2, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 74adcc7a56a65e2489172438ae49c3d2, type: 3}

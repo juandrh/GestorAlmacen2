@@ -12,7 +12,7 @@ public class AutoDestruir : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Destroy(marcador, 1.0f);
+        Destroy(marcador, 2.0f);
     }
 
     // Update is called once per frame

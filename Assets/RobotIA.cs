@@ -3,93 +3,27 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-// Clase para la creación de marcadores de la ruta
-public class MarcadorRuta
-{
-    public PosicionAlmacen posicion;
-    public float G;
-    public float H;
-    public float F;
-    public GameObject marcador;
-    public MarcadorRuta padre;
-
-    public MarcadorRuta(PosicionAlmacen pos, float g, float h, float f, GameObject marcador, MarcadorRuta r)
-    {
-        posicion = pos;
-        G = g;
-        H = h;
-        F = f;
-        this.marcador = marcador;
-        padre = r;
-    }
-
-    public override bool Equals(object obj)
-    {
-        if ((obj == null) || !this.GetType().Equals(obj.GetType()))
-        {
-            return false;
-        }
-        else
-        {
-            return posicion.Equals(((MarcadorRuta)obj).posicion);
-        }
-
-    }
-
-    public override int GetHashCode()
-    {
-        return 0;
-    }
-
-}
-
-
 
 // Clase principal que proporciona la inteligencia al robot
 public class RobotIA : MonoBehaviour
 {
-    public Almacen almacen;
-    public Material M_frontera;
-    public Material M_visitados;
-    private List<MarcadorRuta> frontera = new List<MarcadorRuta>();
-    private List<MarcadorRuta> visitados = new List<MarcadorRuta>();
-    private List<Vector3> posicionesRuta = new List<Vector3>();
-    public GameObject origen;
-    public GameObject destino;
-    public GameObject pasoRuta;
-    private MarcadorRuta nodoOrigen;
-    private MarcadorRuta nodoDestino;
-    private MarcadorRuta nodoUltimo;
-    private bool terminadoCalculoRuta = false;
-    private List<PosicionAlmacen> posiciones;
-    private Vector3 posicionOrigen;
-    private Vector3 posicionDestino;
+  
+    PosicionAlmacen posicionOrigen;
+    
+    private List<Vector3> posicionesRuta = new List<Vector3>();  
+    public int id;
     [SerializeField] private GameObject robot;
     private bool estaMoviendo = false;
     int indiceMarcadorActual = 0;
     private float velocidad = 30.0f;
     private float velocidadRotacion = 15.0f;
 
-
+    /*
     // Inicio del Algortimo A*
     void EmpezarBuscarRuta()
     {
         terminadoCalculoRuta = false;
-        posiciones = new List<PosicionAlmacen>();
-        // Crea un listado de localizaciones en el almacén por donde puede pasar el robot
-        for (int z = 1; z < almacen.largo - 1; z++)
-            for (int x = 1; x < almacen.ancho - 1; x++)
-            {
-                if (almacen.mapa[x, z] == 0 || almacen.mapa[x, z] == 3 || almacen.mapa[x, z] == 4 || almacen.mapa[x, z] == 5)
-                {
-                    posiciones.Add(new PosicionAlmacen(x, z));
-                }
-            }
-
-        // Los mezcla aleatoriamente para escoger uno 
-        posiciones.Shuffle();
-        posicionDestino = new Vector3(posiciones[0].x * almacen.escala, 0, posiciones[0].z * almacen.escala);
-        nodoDestino = new MarcadorRuta(new PosicionAlmacen(posiciones[0].x, posiciones[0].z), 0, 0, 0, Instantiate(destino, posicionDestino, Quaternion.identity), null);
+        nodoDestino = almacen.escogerDestino();
         // Limpiar listas Frontera y Visitados
         frontera.Clear();
         visitados.Clear();
@@ -113,7 +47,7 @@ public class RobotIA : MonoBehaviour
 
     }
 
-
+    
     // Función principal del búsqueda de nodos del Algoritmo A*
     void BuscarSiguenteNodo(MarcadorRuta marcador)
     {
@@ -157,24 +91,10 @@ public class RobotIA : MonoBehaviour
         frontera.RemoveAt(0);
         nodoUltimo = mRuta;
     }
-
+    
 
     // Actualiza los datos de los marcadores
-    bool actualizaMarcadores(PosicionAlmacen pos, float g, float h, float f, MarcadorRuta marcador)
-    {
-        foreach (MarcadorRuta m in frontera)
-        {
-            if (m.posicion.Equals(pos))
-            {
-                m.G = g;
-                m.H = h;
-                m.F = f;
-                m.padre = marcador;
-                return true;
-            }
-        }
-        return false;
-    }
+    
 
     // Consulta si el nodo se ha visitado
     bool estaVisitado(PosicionAlmacen pos)
@@ -185,7 +105,7 @@ public class RobotIA : MonoBehaviour
         }
         return false;
     }
-
+    
     // Almacena y muestra la ruta más corta calculada
     void CogerRutaEncontrada()
     {
@@ -204,22 +124,22 @@ public class RobotIA : MonoBehaviour
         posicionesRuta.Reverse();
 
     }
-
+*/
     // Start is called before the first frame update
     void Start()
     {
 
-        posicionOrigen = robot.transform.position;
-
-        nodoOrigen = new MarcadorRuta(new PosicionAlmacen(13, 4), 0, 0, 0, Instantiate(origen, posicionOrigen, Quaternion.identity), null);
+        posicionOrigen = new PosicionAlmacen ((int)robot.transform.position.x/3,(int)robot.transform.position.z/3);
+        //Debug.Log(posicionOrigen.x+","+posicionOrigen.z);
+       // nodoOrigen = new MarcadorRuta(posicionOrigen, 0, 0, 0, Instantiate(origen, posicionOrigen, Quaternion.identity), null);
 
     }
 
     // Update is called once per frame
     void Update()
     {
-        // Comenzar el proceso pulsando 'C'
-        if (Input.GetKeyDown(KeyCode.C)) EmpezarBuscarRuta();
+        
+       
 
         // Dirigirse al destino tras el cálculo de la ruta
         if (estaMoviendo)
@@ -234,7 +154,7 @@ public class RobotIA : MonoBehaviour
             {
                 indiceMarcadorActual = 0;
                 estaMoviendo = false;
-                EmpezarBuscarRuta();
+              //  EmpezarBuscarRuta();
             }
 
             // Girar en dirección del siguiente nodo y avanzar

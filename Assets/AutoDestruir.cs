@@ -7,12 +7,13 @@ using UnityEngine;
 public class AutoDestruir : MonoBehaviour
 {
     [SerializeField] private GameObject marcador;
+    [SerializeField] private float tiempo;
 
 
     // Start is called before the first frame update
     void Start()
     {
-        Destroy(marcador, 2.0f);
+        Destroy(marcador, tiempo);
     }
 
     // Update is called once per frame

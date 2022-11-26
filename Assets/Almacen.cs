@@ -47,25 +47,21 @@ public class Nodo
 {
 
     public List<PosicionAlmacen> posicionesNodo; // posiciones robots en este nodo
-    public float alfa;
-    public float beta;
-    public float valor;
+    public List<float> valores = new List<float>();
     public GameObject marcador;
     public Nodo padre;
     public int jugador;
 
-    
 
-    public Nodo(List<PosicionAlmacen> posicionesNodo, int j,float a, float b, float v,  Nodo p)
+
+    public Nodo(List<PosicionAlmacen> posicionesNodo, int j, List<float> valores, Nodo p)
     {
-      
+
         this.posicionesNodo = new List<PosicionAlmacen>(posicionesNodo);
         jugador = j;
-        alfa = a;
-        beta = b;
-        valor = v;        
-        padre = p;  
-              
+        this.valores = valores;
+        padre = p;
+
     }
 
     public bool Equals(Nodo obj)
@@ -76,19 +72,20 @@ public class Nodo
         }
         else
         {
-            
+
             foreach (PosicionAlmacen p in posicionesNodo)
             {
-                if(!p.Equals(obj.posicionesNodo)){
+                if (!p.Equals(obj.posicionesNodo))
+                {
                     return false;
                 }
 
 
             }
             return true;
-         }
+        }
 
-    } 
+    }
 
     public override int GetHashCode()
     {
@@ -121,37 +118,35 @@ public class Almacen : MonoBehaviour
     [SerializeField] private GameObject bloqueES;
     [SerializeField] private GameObject bloqueRecarga;
     [SerializeField] private GameObject bloqueEstanteria;
-    
+
     [SerializeField] private GameObject marcador;
     [SerializeField] private GameObject marcadorDestino;
-   [SerializeField]  private GameObject robot1 ;
-   [SerializeField]  private GameObject robot2 ;
-    private PosicionAlmacen destino; 
-    private List<PosicionAlmacen> posicionesIniciales = new List<PosicionAlmacen>();  
-    private List<Nodo> frontera = new List<Nodo>(); 
-    private List<Nodo> visitados = new List<Nodo>(); 
+    [SerializeField] private GameObject robot1;
+    [SerializeField] private GameObject robot2;
+    private PosicionAlmacen destino;
+    private List<PosicionAlmacen> posicionesIniciales = new List<PosicionAlmacen>();
+    private List<Nodo> frontera = new List<Nodo>();
+    private List<Nodo> visitados = new List<Nodo>();
+    private List<float> valoresIniciales = new List<float>();
     private int jugador;
 
-    private int contador = 0;
+    //private int contador = 0;
 
-   // private  int ganador;
+    // private  int ganador;
     //private int numRobots= 2;
     //private bool terminadoCalculo = false;
 
-  
+
 
     // Start is called before the first frame update
     void Start()
     {
         GenerarMapa();
         DibujarMapa();
-        
-        posicionesIniciales.Add(new PosicionAlmacen ((int)(robot1.transform.position.x/3),(int)(robot1.transform.position.z/3)));
-        posicionesIniciales.Add(new PosicionAlmacen ((int)robot2.transform.position.x/3,(int)robot2.transform.position.z/3));
-        escogerDestino();
-        // Añadir primer nodo al grafo
-        frontera.Add(new Nodo(posicionesIniciales,0,0.0f,0.0f,0.0f,null));
-        
+
+       
+
+
     }
 
 
@@ -251,19 +246,38 @@ public class Almacen : MonoBehaviour
                 }
             }
     }
-    
+
 
     // Update is called once per frame
     void Update()
     {
-            // Comenzar el proceso pulsando 'C'
-            if (Input.GetKeyDown(KeyCode.C)) 
-            {
-               Negamax_alfa_beta(frontera[0], 0.0f, 0.0f) ;
+        // Comenzar el proceso pulsando 'C'
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+           ejecutaAlgoritmo();
+        }
             }
-           //Debug.Log(robot1.transform.position.x);
 
-           
+    void ejecutaAlgoritmo()
+    {
+        
+        valoresIniciales.Clear();
+        posicionesIniciales.Clear();
+        frontera.Clear();
+
+        
+        valoresIniciales.Add(0.0f);
+        valoresIniciales.Add(0.0f);
+        posicionesIniciales.Add(new PosicionAlmacen((int)(robot1.transform.position.x / 3), (int)(robot1.transform.position.z / 3)));
+        posicionesIniciales.Add(new PosicionAlmacen((int)(robot2.transform.position.x / 3), (int)(robot2.transform.position.z / 3)));
+        escogerDestino();
+        Instantiate(marcadorDestino, new Vector3(destino.x * escala, 0, destino.z * escala), Quaternion.identity);
+        // Añadir primer nodo al grafo       
+        frontera.Add(new Nodo(posicionesIniciales, 0, valoresIniciales, null));        
+        Nodo nodo= Negamax_alfa_beta(frontera[0]);
+
+        
+
     }
 
 
@@ -271,7 +285,7 @@ public class Almacen : MonoBehaviour
     {
         List<PosicionAlmacen> posiciones = new List<PosicionAlmacen>();
         // 
-        
+
         for (int z = 1; z < largo - 1; z++)
             for (int x = 1; x < ancho - 1; x++)
             {
@@ -284,120 +298,152 @@ public class Almacen : MonoBehaviour
         // Los mezcla aleatoriamente para escoger uno 
         posiciones.Shuffle();
         // Asigna el valor de destino a una posicion de almacén
-        plano[posiciones[0].x,posiciones[0].z]= 100;
-        destino = new PosicionAlmacen(posiciones[0].x,posiciones[0].z);
-        Instantiate(marcadorDestino, new Vector3(destino.x*escala,0,destino.z*escala), Quaternion.identity);
+        plano[posiciones[0].x, posiciones[0].z] = 100;
+        destino = new PosicionAlmacen(posiciones[0].x, posiciones[0].z);
+       
+        
     }
 
     // Algoritmo Poda alfa-beta con negamax
-  
-    public float Negamax_alfa_beta(Nodo nodo, float alfa, float beta)
-    {
-        
-            if (contador ==1000) return 0.0f;;
-         int jugadorActual;
-         if(nodo.jugador==posicionesIniciales.Count-1)
-         { jugadorActual = 0;
-         } else{
-            jugadorActual = nodo.jugador+1;
-         }
-         
-         //if (plano[x, z] == 0 || plano[x, z] == 3 || plano[x, z] == 4 || plano[x, z] == 5)
-        
-        if (esTerminal(nodo) || esFrontera(nodo)){
-            return 0.0f;  // ------------------------------------------cambiar -----------------
-        }
-        List<Nodo> hijos = new List<Nodo>(); 
 
+    public Nodo Negamax_alfa_beta(Nodo nodo)
+    {
+
+        
+        if (esTerminal(nodo) || esFrontera(nodo))
+        {
+            return new Nodo(nodo.posicionesNodo,nodo.jugador,FuncionEvaluacion(nodo.posicionesNodo),nodo.padre);  
+        }
+        
+        
+        
+        // Actualizar jugador
+        //if (contador == 10) return nodo; 
+        int jugadorActual;
+        if (nodo.jugador == posicionesIniciales.Count-1)
+        {
+            jugadorActual = 0;
+        }
+        else
+        {
+            jugadorActual = nodo.jugador + 1;
+        }
+
+
+        
+        List<Nodo> hijos = new List<Nodo>();
         List<PosicionAlmacen> posicionesHijo = new List<PosicionAlmacen>(nodo.posicionesNodo);
         foreach (PosicionAlmacen pos in direcciones)
         {
-            
-            PosicionAlmacen hijo = pos + nodo.posicionesNodo[jugadorActual];
-            // No buscar en paredes o estanterias
-            if (plano[hijo.x, hijo.z] == 1 || plano[hijo.x, hijo.z] == 2) continue;
-            // No buscar fuera del almacén
-            if (hijo.x < 1 || hijo.x > ancho || hijo.z < 1 || hijo.z > largo)
-             continue;
-            // No buscar si ya esta en frontera
-            if (estaVisitado(new Nodo(posicionesHijo,0,0.0f,0.0f,0.0f,null))) continue;
 
-            posicionesHijo[jugadorActual]= hijo;
-            
-            hijos.Add(new Nodo(posicionesHijo,jugadorActual,alfa, beta,0.0f,nodo));
-            frontera.Add(new Nodo(posicionesHijo,jugadorActual,alfa, beta,0.0f,nodo));
-            Instantiate(marcador, new Vector3(hijo.x*escala,0,hijo.z*escala), Quaternion.identity);
+            PosicionAlmacen posHijo = pos + nodo.posicionesNodo[jugadorActual];
+            // No añadir hijo si son paredes o estanterias
+            if (plano[posHijo.x, posHijo.z] == 1 || plano[posHijo.x, posHijo.z] == 2) continue;
+            // No añadir hijo si es fuera del almacén
+            if (posHijo.x < 1 || posHijo.x > ancho || posHijo.z < 1 || posHijo.z > largo)
+                continue;
+            // No añadir hijo si ya esta ocupada la posición por otro robot
+            bool saltarNodo =false;
+           foreach (PosicionAlmacen posAl in nodo.posicionesNodo)
+           {
+               if ((posHijo.x == posAl.x) && (posHijo.z == posAl.z)){
+                saltarNodo  = true;
+                break;
+               }
+
+           }
+            if(saltarNodo) continue;
+
+            // No añadir hijo si ya es frontera o está visitado
+            if (esFrontera(new Nodo(posicionesHijo, 0, nodo.valores, null))) continue;
+            if (estaVisitado(new Nodo(posicionesHijo, 0, nodo.valores, null))) continue;
+
+
+            // Modificar la posicion del robot
+            posicionesHijo[jugadorActual] = posHijo;            
+            Nodo nuevoNodo = new Nodo(posicionesHijo, jugadorActual,FuncionEvaluacion(posicionesHijo), nodo);
+            hijos.Add(nuevoNodo);
+            frontera.Add(nuevoNodo);
+            Instantiate(marcador, new Vector3(posHijo.x * escala, 0, posHijo.z * escala), Quaternion.identity);
+           
         }
-        foreach (Nodo n in hijos)
+        
+        int mejorHijo=0; 
+        float valorHijo=100000.0f;
+        for (int i=0; i< hijos.Count; i++)
         {
-            
-            float puntuacion = - Negamax_alfa_beta(n, -beta,-alfa);
-            if(puntuacion>alfa){
-                alfa = puntuacion;            
-            }
-            if(alfa >= beta){
-               return alfa; 
-            }
+            if (hijos[i].valores[jugadorActual]<valorHijo)
+            {
+                valorHijo = hijos[i].valores[jugadorActual];
+                mejorHijo = i;
+            }    
+
         }
-        return alfa;
-    }  
-    
-    float FuncionEvaluacion(Nodo nodo)
-    {
-      
-       float minimo = 1000000.0f;
-       int indiceNodoMasCerca;
-       foreach (PosicionAlmacen pos in nodo.posicionesNodo)      
-      {
-        float temp = (pos.x-destino.x)*(pos.x-destino.x) + (pos.z-destino.z)*(pos.z-destino.z);
-        
-        if(temp<minimo){
-            minimo = temp;
-            indiceNodoMasCerca = nodo.posicionesNodo.IndexOf(pos);
-        }
-      }
-       
-       
-        
-      //  rehacer en funcion de algoritmo
-        
-      
-      if (minimo==0){
-        return 0;
-      } else  return 1/minimo;
-     
+
+
+        return Negamax_alfa_beta(hijos[mejorHijo]);
     }
 
-        
+    List<float> FuncionEvaluacion(List<PosicionAlmacen> p)
+    {
+        List<float> val = new List<float>();
+        //float minimo = 1000000.0f;
+        //int indiceNodoMasCerca;
+        for (int i = 0; i < p.Count; i++)
+        // foreach (PosicionAlmacen pos in nodo.posicionesNodo)      
+        {
+            val.Add((p[i].x - destino.x) * (p[i].x - destino.x) + (p[i].z - destino.z) * (p[i].z - destino.z));
+
+            /* if(temp<minimo){
+                minimo = temp;
+                indiceNodoMasCerca = nodo.posicionesNodo.IndexOf(pos);
+            } */
+        }
+        return val;
+
+
+        //  rehacer en funcion de algoritmo
+
+
+        /* if (minimo==0){
+          return 0;
+        } else  return 1/minimo; */
+
+    }
+
+    
 
 
     bool esTerminal(Nodo nodo)
     {
-          
+
         float minimo = 1000000.0f;
-       int indiceNodoMasCerca;
-       foreach (PosicionAlmacen pos in nodo.posicionesNodo)      
-      {
-        float temp = (pos.x-destino.x)*(pos.x-destino.x) + (pos.z-destino.z)*(pos.z-destino.z);
-        
-        if(temp<minimo){
-            minimo = temp;
-            indiceNodoMasCerca = nodo.posicionesNodo.IndexOf(pos);
+        int indiceNodoMasCerca;
+        foreach (PosicionAlmacen pos in nodo.posicionesNodo)
+        {
+            float temp = (pos.x - destino.x) * (pos.x - destino.x) + (pos.z - destino.z) * (pos.z - destino.z);
+
+            if (temp < minimo)
+            {
+                minimo = temp;
+                indiceNodoMasCerca = nodo.posicionesNodo.IndexOf(pos);
+            }
         }
-      }
-       
-        
-      //  rehacer en funcion del algoritmo
-        
-      
-      if (minimo==0){
-        return true;
-      } else  return false;
-     
+
+
+        //  rehacer en funcion del algoritmo
+
+
+        if (minimo == 0)
+        {
+            return true;
+        }
+        else return false;
+
     }
 
 
-    
+
 
     bool esFrontera(Nodo nodo)
     {
@@ -418,6 +464,6 @@ public class Almacen : MonoBehaviour
     }
 
 
-    
-    
+
+
 }

@@ -125,8 +125,7 @@ public class Almacen : MonoBehaviour
     [SerializeField] private GameObject robot2;
     private PosicionAlmacen destino;
     private List<PosicionAlmacen> posicionesIniciales = new List<PosicionAlmacen>();
-    private Nodo nodoInicial;
-    private List<Nodo> frontera = new List<Nodo>();
+    private Nodo nodoInicial;    
     private List<Nodo> visitados = new List<Nodo>();
     private List<Nodo> soluciones = new List<Nodo>();
     private List<Vector3> ruta = new List<Vector3>();
@@ -290,8 +289,7 @@ public class Almacen : MonoBehaviour
     void ejecutaAlgoritmo()
     {        
         Debug.Log("Empezando!");
-        posicionesIniciales.Clear();
-        frontera.Clear();
+        posicionesIniciales.Clear();       
         visitados.Clear();
         soluciones.Clear();
         ruta.Clear();

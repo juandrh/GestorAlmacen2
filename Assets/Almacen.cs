@@ -375,11 +375,15 @@ public class Almacen : MonoBehaviour
         if (esTerminal(nodo.posicionesNodo))
         {
             soluciones.Add(nodo);
-            if (nodo.nivel == 0)
+
+            float distanciaCuadrado =((nodo.posicionesNodo[jugador].x - destino.x) * (nodo.posicionesNodo[jugador].x - destino.x)
+             + (nodo.posicionesNodo[jugador].z - destino.z) * (nodo.posicionesNodo[jugador].z - destino.z));
+            if ( distanciaCuadrado == 0)
             {
                 return 1;
             }
-            else return 1 / nodo.nivel;   // El valor de una solución es el 
+            //else return 1 / nodo.nivel;   
+            else return  (float) 1/ distanciaCuadrado ;
         }
 
         // Crear hijos  -------------

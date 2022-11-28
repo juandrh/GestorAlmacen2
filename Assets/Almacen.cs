@@ -137,6 +137,8 @@ public class Almacen : MonoBehaviour
     private float velocidad = 30.0f;
     private float velocidadRotacion = 15.0f;
 
+    private int profundidadBusqueda = 200;
+
 
 
     // Start is called before the first frame update
@@ -300,7 +302,7 @@ public class Almacen : MonoBehaviour
         Instantiate(marcadorDestino, new Vector3(destino.x * escala, 0, destino.z * escala), Quaternion.identity);
         nodoInicial = new Nodo(posicionesIniciales, 0, 1, -inf, null);
         // Comienza el algortimo con una profundidad de búsqueda de 140 niveles
-        minimax_alfa_beta(0, nodoInicial, 140, -inf, inf);
+        minimax_alfa_beta(0, nodoInicial, profundidadBusqueda, -inf, inf);
         Debug.Log("--> Finalizada busqueda!");       
 
         if (soluciones.Count > 0)  // para el caso en que haya encontrado soluciones terminales

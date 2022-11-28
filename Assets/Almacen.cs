@@ -444,6 +444,7 @@ public class Almacen : MonoBehaviour
             }
 
         }
+        // Ejecuta el turno del robot 1 (max)
         if (jugador == 0)
         {
                       
@@ -470,7 +471,7 @@ public class Almacen : MonoBehaviour
             return mejorAlfa;
 
         }
-        else
+        else  // Ejecuta el turno del robot 2 (min)
         {
             float mejorBeta = inf;
 

@@ -370,19 +370,18 @@ public class Almacen : MonoBehaviour
         visitados.Add(nodo);
 
         // Al llegar a un nodo temrinal devolver el valor de evaluación 
-        // Se trata del inverso del número de niveles que ha descendido (longitud del camino)
-        // Porque se busca el camino más corto
+        // Se trata del inverso de la distancia al destino (al cuadrado)
+        // Maximizando ese valor se encuentra el camino más corto
         if (esTerminal(nodo.posicionesNodo))
         {
             soluciones.Add(nodo);
-
             float distanciaCuadrado =((nodo.posicionesNodo[jugador].x - destino.x) * (nodo.posicionesNodo[jugador].x - destino.x)
              + (nodo.posicionesNodo[jugador].z - destino.z) * (nodo.posicionesNodo[jugador].z - destino.z));
+
             if ( distanciaCuadrado == 0)
             {
                 return 1;
-            }
-            //else return 1 / nodo.nivel;   
+            }            
             else return  (float) 1/ distanciaCuadrado ;
         }
 

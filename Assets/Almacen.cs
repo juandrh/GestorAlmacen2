@@ -139,8 +139,6 @@ public class Almacen : MonoBehaviour
 
     private int profundidadBusqueda = 200;
 
-
-
     // Start is called before the first frame update
     void Start()
     {

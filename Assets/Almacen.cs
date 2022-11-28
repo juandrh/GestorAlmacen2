@@ -15,13 +15,8 @@ public class PosicionAlmacen
         z = _z;
     }
 
-    public Vector2 ToVector()
-    {
-        return new Vector2(x, z);
-    }
-
     public static PosicionAlmacen operator +(PosicionAlmacen a, PosicionAlmacen b)
-       => new PosicionAlmacen(a.x + b.x, a.z + b.z);
+     => new PosicionAlmacen(a.x + b.x, a.z + b.z);
 
     public override bool Equals(object obj)
     {
@@ -48,7 +43,6 @@ public class Nodo
 
     public List<PosicionAlmacen> posicionesNodo; // posiciones robots en este nodo
     public float valor;
-    public GameObject marcador;
     public Nodo padre;
     public int jugador;
     public int nivel;
@@ -96,8 +90,9 @@ public class Nodo
 
 }
 
-// Clase principal que crea el almacén y marca cada cuadrante según sea
-// suelo, pared, Zona Entrada, Zona salida y zona de recarga
+// Clase principal que crea el almacén 
+// Realiza la búsqueda con el algoritmo Minimax poda alfa-beta
+// Mueve el robot "ganador" hacia el destino
 public class Almacen : MonoBehaviour
 {
 
@@ -120,15 +115,12 @@ public class Almacen : MonoBehaviour
     [SerializeField] private GameObject bloqueES;
     [SerializeField] private GameObject bloqueRecarga;
     [SerializeField] private GameObject bloqueEstanteria;
-
     [SerializeField] private GameObject marcador0;
     [SerializeField] private GameObject marcador1;
     [SerializeField] private GameObject marcadorDestino;
-     [SerializeField] private GameObject marcadorOrigen;
-
-     [SerializeField] private GameObject marcadorRuta1;
-     [SerializeField] private GameObject marcadorRuta2;
-
+    [SerializeField] private GameObject marcadorOrigen;
+    [SerializeField] private GameObject marcadorRuta1;
+    [SerializeField] private GameObject marcadorRuta2;
     [SerializeField] private GameObject robot1;
     [SerializeField] private GameObject robot2;
     private PosicionAlmacen destino;
@@ -137,23 +129,14 @@ public class Almacen : MonoBehaviour
     private List<Nodo> frontera = new List<Nodo>();
     private List<Nodo> visitados = new List<Nodo>();
     private List<Nodo> soluciones = new List<Nodo>();
-
     private List<Vector3> ruta = new List<Vector3>();
-
     private Nodo mejorSolucion;
-    private int ganador;
-    private List<float> valoresIniciales = new List<float>();
-
     private float inf = 100000.0f;
-
-   
-
-    //private int profundidad;
-    //private int contador = 0;
-
-    // private  int ganador;
-    //private int numRobots= 2;
-    //private bool terminadoCalculo = false;
+    private bool jugador1Moviendo = false;
+    private bool jugador2Moviendo = false;
+    int indiceMarcadorActual = 0;
+    private float velocidad = 30.0f;
+    private float velocidadRotacion = 15.0f;
 
 
 
@@ -162,18 +145,12 @@ public class Almacen : MonoBehaviour
     {
         GenerarMapa();
         DibujarMapa();
-
-
-
-
     }
 
 
     void GenerarMapa()
     {
-
         plano = new int[ancho, largo];
-
         //0 = suelo, 1 = pared, 2 = estanteria, 3- Zona Entrada, 4 = Zona salida, 5 = zona de recarga, 100 = destino , 101..= posiciones iniciales robots
         // Generar suelo al mapa        
         for (int z = 1; z < largo - 1; z++)
@@ -226,8 +203,6 @@ public class Almacen : MonoBehaviour
             {
                 plano[x, z] = 5;
             }
-
-
     }
 
 
@@ -270,70 +245,105 @@ public class Almacen : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // Comenzar el proceso pulsando 'C'
+        // Comenzar la búsqueda pulsando 'C'
         if (Input.GetKeyDown(KeyCode.C))
         {
             ejecutaAlgoritmo();
         }
+
+        // Mover robot adecuado cuando se encuentra la solución
+        if (jugador1Moviendo)
+        {
+            // Si llega al punto de la ruta continuar con el siguiente
+            if (Vector3.Distance(robot1.transform.position, ruta[indiceMarcadorActual]) < 3)
+                indiceMarcadorActual++;
+            // Si llega al final de la ruta empezar de nuevo el proceso global
+            if (indiceMarcadorActual >= ruta.Count)
+            {
+                indiceMarcadorActual = 0;
+                jugador1Moviendo = false;
+            }
+            // Girar en dirección del siguiente nodo y avanzar
+            Quaternion mirarPuntoRuta = Quaternion.LookRotation(ruta[indiceMarcadorActual] - robot1.transform.position);
+            robot1.transform.rotation = Quaternion.Slerp(robot1.transform.rotation, mirarPuntoRuta, velocidadRotacion * Time.deltaTime);
+            robot1.transform.Translate(0, 0, velocidad * Time.deltaTime);
+        }
+        if (jugador2Moviendo)
+        {
+            // Si llega al punto de la ruta continuar con el siguiente
+            if (Vector3.Distance(robot2.transform.position, ruta[indiceMarcadorActual]) < 3)
+                indiceMarcadorActual++;
+            // Si llega al final de la ruta empezar de nuevo el proceso global
+            if (indiceMarcadorActual >= ruta.Count)            {
+                indiceMarcadorActual = 0;
+                jugador2Moviendo = false;
+            }
+            // Girar en dirección del siguiente nodo y avanzar
+            Quaternion mirarPuntoRuta = Quaternion.LookRotation(ruta[indiceMarcadorActual] - robot2.transform.position);
+            robot2.transform.rotation = Quaternion.Slerp(robot2.transform.rotation, mirarPuntoRuta, velocidadRotacion * Time.deltaTime);
+            robot2.transform.Translate(0, 0, velocidad * Time.deltaTime);
+        }
     }
 
-    void ejecutaAlgoritmo()
-    {
 
-        //profundidad = 5;
-        Debug.Log ("Empezando!");
+    // Inicio del proceso
+    void ejecutaAlgoritmo()
+    {        
+        Debug.Log("Empezando!");
         posicionesIniciales.Clear();
         frontera.Clear();
         visitados.Clear();
         soluciones.Clear();
+        ruta.Clear();
         mejorSolucion = null;
-
-
         posicionesIniciales.Add(new PosicionAlmacen((int)(robot1.transform.position.x / 3), (int)(robot1.transform.position.z / 3)));
         posicionesIniciales.Add(new PosicionAlmacen((int)(robot2.transform.position.x / 3), (int)(robot2.transform.position.z / 3)));
         escogerDestino();
         Instantiate(marcadorDestino, new Vector3(destino.x * escala, 0, destino.z * escala), Quaternion.identity);
         nodoInicial = new Nodo(posicionesIniciales, 0, 1, -inf, null);
-        
-        float resultado = minimax_alfa_beta(0, nodoInicial, 140, -inf, inf);
+        // Comienza el algortimo con una profundidad de búsqueda de 140 niveles
+        minimax_alfa_beta(0, nodoInicial, 140, -inf, inf);
+        Debug.Log("--> Finalizada busqueda!");       
 
-        Debug.Log ("Finalizada busqueda!");
-        // Debug.Log (resultado);
-
-         if (soluciones.Count>0)
+        if (soluciones.Count > 0)  // para el caso en que haya encontrado soluciones terminales
         {
-            int minimo=10000;
-            
-            foreach(Nodo n in soluciones)
+            int minimo = 10000;  // Se establece un valor muy alto para luego encontrar el mínimo
+            foreach (Nodo n in soluciones)
             {
-                if(n.nivel<minimo)
+                if (n.nivel < minimo)
                 {
                     minimo = n.nivel;
                     mejorSolucion = n;
                 }
             }
-            
-            Debug.Log ("ganador valor ->"+minimo);
-            Debug.Log ("ganador num ->"+mejorSolucion.padre.jugador);
+
+            Debug.Log("--> Robot ganador ->" + mejorSolucion.padre.jugador);
+            // calcula la ruta ganadora y mueve el robot correspondiente
             CogerRutaEncontrada(mejorSolucion.padre.jugador);
-
-        } else {
-
-         Debug.Log ("No hay ganador");
+            if (mejorSolucion.padre.jugador == 0)
+            {
+                jugador1Moviendo = true;
+            }
+            else if (mejorSolucion.padre.jugador == 1)
+            {
+                jugador2Moviendo = true;
+            }
         }
-
-
+        else   
+        {
+            Debug.Log("No hay ganador");
+        }
     }
 
-
+    // Escoger una localización de destino al azar.
     void escogerDestino()
     {
-        List<PosicionAlmacen> posiciones = new List<PosicionAlmacen>();
-        // 
+        List<PosicionAlmacen> posiciones = new List<PosicionAlmacen>();   
 
         for (int z = 1; z < largo - 1; z++)
             for (int x = 1; x < ancho - 1; x++)
             {
+                // evitar paredes al buscar destino
                 if (plano[x, z] == 0 || plano[x, z] == 3 || plano[x, z] == 4 || plano[x, z] == 5)
                 {
                     posiciones.Add(new PosicionAlmacen(x, z));
@@ -345,35 +355,33 @@ public class Almacen : MonoBehaviour
         // Asigna el valor de destino a una posicion de almacén
         plano[posiciones[0].x, posiciones[0].z] = 100;
         destino = new PosicionAlmacen(posiciones[0].x, posiciones[0].z);
-
-
     }
 
     // Algoritmo Poda alfa-beta con negamax
-
     public float minimax_alfa_beta(int jugador, Nodo nodo, int profundidad, float alfa, float beta)
     {
-         if (profundidad<1)
+        // Limita el algoritmo a una profundidad de búsqueda dada para evitar consumir  todos los recursos del ordenador
+        if (profundidad < 1)
         {
             return nodo.valor;
-        }else profundidad--; 
+        }
+        else profundidad--;
 
 
         // Recuerda las posiciones ya vistas para no caer en ciclos infinitos
         visitados.Add(nodo);
 
+        // Al llegar a un nodo temrinal devolver el valor de evaluación 
+        // Se trata del inverso del número de niveles que ha descendido (longitud del camino)
+        // Porque se busca el camino más corto
         if (esTerminal(nodo.posicionesNodo))
         {
             soluciones.Add(nodo);
-            Debug.Log (nodo.nivel);
             if (nodo.nivel == 0)
             {
                 return 1;
-
             }
-            else return 1 / nodo.nivel;   // El valor de una solución es el inverso del número de niveles que ha descendido (longitud del camino)
-
-            
+            else return 1 / nodo.nivel;   // El valor de una solución es el 
         }
 
         // Crear hijos  -------------
@@ -390,7 +398,6 @@ public class Almacen : MonoBehaviour
                 continue;
             // No añadir hijo si ya esta ocupada la posición por otro robot
             bool saltarHijo = false;
-            
             foreach (PosicionAlmacen posPadre in nodo.posicionesNodo)
             {
                 if ((posHijo.x == posPadre.x) && (posHijo.z == posPadre.z))
@@ -403,26 +410,27 @@ public class Almacen : MonoBehaviour
 
             // modificar posicion del robot (jugador) actual
             posicionesHijo[jugador] = posHijo;
-            // No añadir hijo si ya está visitado      
-                  
+            // No añadir hijo si ya está visitado  
             if (estaVisitado(posicionesHijo, jugador)) continue;
 
             if (jugador == 0)
             {
                 hijos.Add(new Nodo(posicionesHijo, 1, nodo.nivel + 1, inf, nodo));
-                Instantiate(marcador0, new Vector3(posHijo.x * escala-2, 0, posHijo.z * escala-2), Quaternion.identity);
+                // añade marcador en pantalla
+                Instantiate(marcador0, new Vector3(posHijo.x * escala - 2, 0, posHijo.z * escala - 2), Quaternion.identity);
             }
             else
             {
                 hijos.Add(new Nodo(posicionesHijo, 0, nodo.nivel + 1, -inf, nodo));
-                Instantiate(marcador1, new Vector3(posHijo.x * escala+2, 0, posHijo.z * escala+2), Quaternion.identity);
+                Instantiate(marcador1, new Vector3(posHijo.x * escala + 2, 0, posHijo.z * escala + 2), Quaternion.identity);
             }
 
-            
+
         }
         // Fin crear hijos -----------------
 
-        // Si se llega a un callejón sin salida
+        // Si se llega a un callejón sin salida marcar como peor solución
+
         if (hijos.Count == 0)
         {
             if (jugador == 0)
@@ -437,62 +445,62 @@ public class Almacen : MonoBehaviour
         }
         if (jugador == 0)
         {
-            float mejor = -inf;
+                      
+            float mejorAlfa = -inf;
 
             for (int i = 0; i < hijos.Count; i++)
             {
                 float puntuacion = minimax_alfa_beta(1, hijos[i], profundidad, alfa, beta);
                 hijos[i].valor = puntuacion;
-                if (puntuacion > mejor)
+                if (puntuacion > mejorAlfa)
                 {
-                    mejor = puntuacion;
+                    mejorAlfa = puntuacion;
                 }
-                if (mejor > alfa)
+                if (mejorAlfa > alfa)
                 {
-                    alfa = mejor;
+                    alfa = mejorAlfa;
                 }
                 if (beta <= alfa)
                 {
-                    break;
+                    break;  // podar rama 
                 }
 
             }
-            return mejor;
+            return mejorAlfa;
 
         }
         else
         {
-            float mejor = inf;
+            float mejorBeta = inf;
 
             for (int i = 0; i < hijos.Count; i++)
             {
                 float puntuacion = minimax_alfa_beta(0, hijos[i], profundidad, alfa, beta);
                 hijos[i].valor = puntuacion;
-                if (puntuacion < mejor)
+                if (puntuacion < mejorBeta)
                 {
-                    mejor = puntuacion;
+                    mejorBeta = puntuacion;
                 }
-                if (mejor < beta)
+                if (mejorBeta < beta)
                 {
-                    beta = mejor;
+                    beta = mejorBeta;
                 }
                 if (beta <= alfa)
                 {
-                    break;
+                    break; // podar rama 
                 }
 
             }
-            return mejor;
-
+            return mejorBeta;
         }
     }
 
+    // Calcula si es terminal, es decir, si ha llegado al destino
     bool esTerminal(List<PosicionAlmacen> listaPosiciones)
     {
-
         float minimo = 1000000.0f;
         int indiceNodoMasCerca = 0;
-        PosicionAlmacen posMinima = new PosicionAlmacen(0,0);
+        PosicionAlmacen posMinima = new PosicionAlmacen(0, 0);
         foreach (PosicionAlmacen pos in listaPosiciones)
         {
             float temp = (float)((pos.x - destino.x) * (pos.x - destino.x) + (pos.z - destino.z) * (pos.z - destino.z));
@@ -504,65 +512,53 @@ public class Almacen : MonoBehaviour
                 indiceNodoMasCerca = listaPosiciones.IndexOf(pos);
             }
         }
-
-
-        //  
-
-        
-        if (minimo < 7.1f)
+        if (minimo < 7.1f)  // distancia al destino
         {
-        
-            Debug.Log("Encontrado ---- !!");
-         
-           Instantiate(marcadorOrigen, new Vector3(posMinima.x * escala, 0, posMinima.z * escala), Quaternion.identity);
+            Debug.Log("LLegado a destino.");
+            Instantiate(marcadorOrigen, new Vector3(posMinima.x * escala, 0, posMinima.z * escala), Quaternion.identity);
             return true;
         }
         else
         {
-                
             return false;
         }
     }
 
-
-
     bool estaVisitado(List<PosicionAlmacen> listaPosiciones, int jugador)
     {
-         foreach (Nodo n in visitados)
+        foreach (Nodo n in visitados)
         {
-                   
-                if ((n.posicionesNodo[jugador].x == listaPosiciones[jugador].x)  && (n.posicionesNodo[jugador].z == listaPosiciones[jugador].z))
-                {
-                    
-                    return true;
-                }
-            
+            if ((n.posicionesNodo[jugador].x == listaPosiciones[jugador].x) && (n.posicionesNodo[jugador].z == listaPosiciones[jugador].z))
+            {
+                return true;
+            }
         }
         return false;
     }
 
 
-
+    // Reconstruir la ruta para marcarla en pantalla y mover el robot.
+    // se recosntruye desde el último nodo hasta el comienzo a través de los padres de cada nodo
     void CogerRutaEncontrada(int jugador)
     {
-
         Nodo comienzo = mejorSolucion;
         ruta.Clear();
         while (!nodoInicial.Equals(comienzo) && comienzo != null)
         {
             Vector3 posicionActual = new Vector3(comienzo.posicionesNodo[jugador].x * escala, 0, comienzo.posicionesNodo[jugador].z * escala);
             ruta.Add(posicionActual);
-
-            if(jugador ==0){
+            if (jugador == 0)
+            {
                 Instantiate(marcadorRuta1, posicionActual, Quaternion.identity);
-            } else  Instantiate(marcadorRuta2, posicionActual, Quaternion.identity);
-            
+            }
+            else
+            {
+                Instantiate(marcadorRuta2, posicionActual, Quaternion.identity);
+            }
             comienzo = comienzo.padre;
-
         }
-        
+        // Una vez encontrada invertir la ruta para que el robot la siga
         ruta.Reverse();
-
     }
 
 }

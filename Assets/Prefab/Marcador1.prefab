@@ -111,4 +111,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   marcador: {fileID: 121392069488113083}
-  tiempo: 6
+  tiempo: 3
